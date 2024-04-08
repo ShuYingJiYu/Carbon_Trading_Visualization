@@ -30,5 +30,8 @@ module.exports = {
         "@typescript-eslint",
         "vue"
     ],
-    "rules": {}
+    "rules": {
+        'vue/multi-word-component-names': 'off',
+        "@typescript-eslint/no-explicit-any": ["off"]
+    }
 }
