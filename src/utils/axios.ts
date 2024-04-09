@@ -21,10 +21,11 @@ instance.interceptors.request.use(
   (err) => Promise.reject(err)
 )
 
+
 instance.interceptors.response.use(
   (res) => {
     if (res.data.code === 200) {
-      return res
+      return res 
     }
     ElMessage({ message: res.data.message || '服务异常', type: 'error' })
     return Promise.reject(res.data)
@@ -41,3 +42,8 @@ instance.interceptors.response.use(
 
 export default instance
 export { baseURL }
+export interface Data<T> {
+  code: string
+  msg: string
+  result: T
+}
