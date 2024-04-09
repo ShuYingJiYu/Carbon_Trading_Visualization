@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
+import { resolve } from 'path'
 
 export default defineConfig({
     // ...
@@ -15,4 +16,11 @@ export default defineConfig({
             resolvers: [ElementPlusResolver()],
         }),
     ],
+    resolve: {
+        // 设置路径别名
+        alias: {
+            '@': resolve(__dirname, './src'),
+            '*': resolve('')
+        },
+    }
 })
