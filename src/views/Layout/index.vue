@@ -1,23 +1,22 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-import { onMounted } from 'vue';
+<script lang="ts" setup>
+import { onMounted, ref } from "vue";
 
 // import { adminLoginAPI } from '@/apis/admin/login';
-import {EnterpriseLoginAPI} from '@/apis/enterprise/login'
-import { LoginParams } from '@/types/login';
+import { EnterpriseLoginAPI } from "@/apis/enterprise/login";
+import { LoginParams } from "@/types/login";
 
-const test = async ()=>{
-  const params = ref<LoginParams>()
+const test = async () => {
+  const params = ref<LoginParams>();
   params.value = {
-    account: '2022117316',
-    password: 'j'
-  }
+    account: "2022117316",
+    password: "j",
+  };
   const res = await EnterpriseLoginAPI(params.value);
-  console.log(res)
-}
-onMounted(()=>{
-  test()
-})
+  console.log(res);
+};
+onMounted(() => {
+  test();
+});
 </script>
 
 <template>

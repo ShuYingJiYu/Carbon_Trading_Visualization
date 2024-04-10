@@ -1,9 +1,9 @@
 export type LoginParams = {
-  account: string,
-  password: string
-}
+  account: string;
+  password: string;
+};
 
 export type LoginResult = {
-  token: string,
-  type: string,
-}
+  authorization: string;
+  type: string;
+};

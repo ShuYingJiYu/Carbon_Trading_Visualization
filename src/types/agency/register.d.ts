@@ -1,5 +1,5 @@
 export type AgencyRegisterParams = {
-  account: string,
-  password: string,
-  name:string
-}
+  account: string;
+  password: string;
+  name: string;
+};
