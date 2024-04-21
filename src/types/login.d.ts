@@ -4,6 +4,6 @@ export type LoginParams = {
 };
 
 export type LoginResult = {
-  authorization: string;
-  type: string;
-};
+  authorization: string,
+  type: string,
+}
