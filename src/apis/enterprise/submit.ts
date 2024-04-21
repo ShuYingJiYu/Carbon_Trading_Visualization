@@ -2,7 +2,7 @@ import { ElectricGridSubmitParams } from "@/types/enterprise/submit/electricGrid
 import { GenerateElectricitySubmitParams } from "@/types/enterprise/submit/generateElectricity";
 import request, { Data } from "@/utils/axios.ts";
 
-export const GenerateElectricitySubmitAPI = (
+export const generateElectricitySubmitAPI = (
   params: GenerateElectricitySubmitParams,
 ): Promise<Data<any>> => {
   return request({
@@ -12,7 +12,7 @@ export const GenerateElectricitySubmitAPI = (
   }).then((res) => res.data as Data<any>);
 };
 
-export const ElectricGridSubmitAPI = (
+export const electricGridSubmitAPI = (
   params: ElectricGridSubmitParams,
 ): Promise<Data<any>> => {
   return request({

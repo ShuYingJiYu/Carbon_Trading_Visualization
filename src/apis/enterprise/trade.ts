@@ -1,7 +1,7 @@
 import { EnterpriseTradeParams } from "@/types/enterprise/trade";
 import request, { Data } from "@/utils/axios.ts";
 
-export const EnterpriseTradeAPI = (
+export const enterpriseTradeAPI = (
   params: EnterpriseTradeParams,
 ): Promise<Data<any>> => {
   return request({

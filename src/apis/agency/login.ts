@@ -1,7 +1,7 @@
 import { LoginParams, LoginResult } from "@/types/login";
 import request, { Data } from "@/utils/axios.ts";
 
-export const AgencyLoginAPI = (
+export const agencyLoginAPI = (
   params: LoginParams,
 ): Promise<Data<LoginResult>> => {
   return request({

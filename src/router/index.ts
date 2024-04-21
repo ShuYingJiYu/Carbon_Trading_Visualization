@@ -5,14 +5,38 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      component: () => import("../views/Layout/index.vue"),
+      component: () => import("../views/LayoutIndex.vue"),
       children: [
         {
-          path: "/home",
-          component: () => import("../views/Home/index.vue"),
+          path:'/info_view',
+          component:()=>import('../views/InfoView.vue')
         },
+        {
+          path:'/data_submit',
+          component:()=>import('../views/DataSubmit.vue')
+        },
+        {
+          path:'/data_history',
+          component:()=>import('../views/DataHistory.vue')
+        },
+        {
+          path:'/trade_apply',
+          component:()=>import('../views/TradeApply.vue')
+        },
+        {
+          path:'/trade_apply',
+          component:()=>import('../views/TradeApply.vue')
+        },
+        {
+          path:'/trade_history',
+          component:()=>import('../views/TradeHistory.vue')
+        }
       ],
     },
+    {
+      path: "/login",
+      component: () => import("../views/LoginView.vue"),
+    }
   ],
 });
 

@@ -1,7 +1,7 @@
 import { EnterpriseRegisterParams } from "@/types/enterprise/register";
 import request, { Data } from "@/utils/axios.ts";
 
-export const EnterpriseRegisterAPI = (
+export const enterpriseRegisterAPI = (
   params: EnterpriseRegisterParams,
 ): Promise<Data<any>> => {
   return request({

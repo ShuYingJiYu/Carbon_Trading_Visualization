@@ -1,7 +1,7 @@
 import { AgencyRegisterParams } from "@/types/agency/register";
 import request, { Data } from "@/utils/axios.ts";
 
-export const AgencyRegisterAPI = (
+export const agencyRegisterAPI = (
   params: AgencyRegisterParams,
 ): Promise<Data<any>> => {
   return request({

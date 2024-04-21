@@ -3,4 +3,7 @@ export type EnterpriseInfo = {
   name: string;
   type: string;
   carbon_coin: number;
+  create_time: string,
+  trade_count: number,
+  submit_count: number
 };
