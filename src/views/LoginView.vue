@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { RegisterParams } from "@/types/register";
 import { ref } from "vue";
-import type { FormInstance, FormRules } from "element-plus";
+import { type FormInstance, type FormRules } from "element-plus";
 import { agencyLoginAPI } from "@/apis/agency/login";
 import { adminLoginAPI } from "@/apis/admin/login";
 import { enterpriseLoginAPI } from "@/apis/enterprise/login";
@@ -9,8 +9,9 @@ import { useClientStore } from "@/stores";
 import { LoginParams } from "@/types/login";
 import { agencyRegisterAPI } from "@/apis/agency/register";
 import { enterpriseRegisterAPI } from "@/apis/enterprise/register";
-import {useRouter} from 'vue-router'
-const router = useRouter()
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+const router = useRouter();
 const clientStore = useClientStore();
 const formData = ref<RegisterParams>({
   account: "",
@@ -20,76 +21,87 @@ const formData = ref<RegisterParams>({
   type: "",
 });
 const rules = ref<FormRules<RegisterParams>>({
-  account: [
-    { required: true, message: "请输入账号", trigger: "blur" },
+  account: [{ required: true, message: "请输入账号", trigger: "blur" }],
+  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+  name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+  identity: [{ required: true, message: "请选择身份", trigger: "blur" }],
+  type: [
+    {
+      validator: (rule, value, callback) => {
+        if (formData.value.identity === "企业" && value === "") {
+          rule;
+          callback(new Error("请选择类别"));
+        } else {
+          callback();
+        }
+      },
+      trigger: "blur",
+    },
   ],
-  password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
-  ],
-  name: [
-    { required: true, message: "请输入用户名", trigger: "blur" },
-  ],
-  identity: [
-    { required: true, message: "请选择身份", trigger: "blur" },
-  ],
-  type:[
-    { validator: (rule, value, callback) => {
-      if(formData.value.identity === '企业' && value === ''){
-        rule
-        callback(new Error('请选择类别'));
-      }else{
-        callback();
-      }
-    }, trigger: 'blur' }
-  ]
 });
 
 const formRef = ref<FormInstance | null>(null);
 
-const login=async (formRef:FormInstance | null)=>{
-  await formRef?.validate()
+const login = async (formRef: FormInstance | null) => {
+  await formRef?.validate();
   const loginData = {
     account: formData.value.account,
     password: formData.value.password,
   } as LoginParams;
-  const res = ref()
-  if(formData.value.identity === '管理员'){
-    res.value = await adminLoginAPI(loginData)
-  }
-  else if(formData.value.identity === '政府'){
-    res.value = await agencyLoginAPI(loginData)
-  }
-  else if(formData.value.identity === '企业'){
-    res.value = await enterpriseLoginAPI(loginData)
+  const res = ref();
+  if (formData.value.identity === "管理员") {
+    res.value = await adminLoginAPI(loginData);
+  } else if (formData.value.identity === "政府") {
+    res.value = await agencyLoginAPI(loginData);
+  } else if (formData.value.identity === "企业") {
+    res.value = await enterpriseLoginAPI(loginData);
   }
   clientStore.setToken(res.value.data.authorization);
   clientStore.setIdentity(formData.value.identity);
-  clientStore.setType(formData.value.type)
-  console.log(res.value)
-  router.back()
-}
+  clientStore.setType(formData.value.type);
+};
 
-const register=async (formRef:FormInstance | null)=>{
-  await formRef?.validate()
+const toLogin = async (formRef: FormInstance | null) => {
+  login(formRef).then(() => {
+    ElMessage({
+      message: "登录成功",
+      type: "success",
+    });
+    router.push("/");
+  });
+};
+
+const register = async (formRef: FormInstance | null) => {
+  await formRef?.validate();
   const registerData = {
     account: formData.value.account,
     password: formData.value.password,
-    name:formData.value.name,
-    identity:formData.value.identity,
-    type:formData.value.type
+    name: formData.value.name,
+    identity: formData.value.identity,
+    type: formData.value.type,
   } as RegisterParams;
-  const res = ref()
-  if(formData.value.identity === '管理员'){
-    console.log('管理员无法注册')
+  const res = ref();
+  if (formData.value.identity === "管理员") {
+    ElMessage({
+      message: "管理员账号须线下申请注册",
+      type: "error",
+    });
+    throw new Error("管理员账号须线下申请注册");
+  } else if (formData.value.identity === "政府") {
+    res.value = await agencyRegisterAPI(registerData);
+  } else if (formData.value.identity === "企业") {
+    res.value = await enterpriseRegisterAPI(registerData);
   }
-  else if(formData.value.identity === '政府'){
-    res.value = await agencyRegisterAPI(registerData)
-  }
-  else if(formData.value.identity === '企业'){
-    res.value = await enterpriseRegisterAPI(registerData)
-  }
-  console.log(res.value)
-}
+};
+
+const toRegister = async (formRef: FormInstance | null) => {
+  register(formRef).then(() => {
+    ElMessage({
+      message: "注册成功",
+      type: "success",
+    });
+  });
+};
 </script>
 
 <template>
@@ -105,35 +117,60 @@ const register=async (formRef:FormInstance | null)=>{
         style="max-width: 400px"
       >
         <el-form-item label="账号" prop="account">
-          <el-input v-model="formData!.account" style="width: 230px;margin-left: 20px;"/>
+          <el-input
+            v-model="formData!.account"
+            style="width: 230px; margin-left: 20px"
+          />
         </el-form-item>
-        <el-form-item label="密码" prop="password" >
-          <el-input v-model="formData!.password" style="width: 230px;margin-left: 20px;" />
+        <el-form-item label="密码" prop="password">
+          <el-input
+            v-model="formData!.password"
+            style="width: 230px; margin-left: 20px"
+          />
         </el-form-item>
         <el-form-item label="用户名" prop="name">
-          <el-input v-model="formData!.name"  style="width: 230px;margin-left: 20px;"/>
+          <el-input
+            v-model="formData!.name"
+            style="width: 230px; margin-left: 20px"
+          />
         </el-form-item>
         <el-form-item label="身份" prop="identity">
           <el-radio-group v-model="formData!.identity" class="ml-2">
             <el-radio value="企业" size="medium">企业</el-radio>
-            <el-radio value="政府" size="medium" @click="formData!.type = ''">政府</el-radio>
-            <el-radio value="管理员" size="medium" @click="formData!.type = ''">管理员</el-radio>
+            <el-radio value="政府" size="medium" @click="formData!.type = ''"
+              >政府</el-radio
+            >
+            <el-radio value="管理员" size="medium" @click="formData!.type = ''"
+              >管理员</el-radio
+            >
           </el-radio-group>
         </el-form-item>
         <el-form-item label="类别" prop="type">
-          <el-radio-group v-model="formData!.type" :disabled="formData!.identity !== '企业'" class="ml-2">
+          <el-radio-group
+            v-model="formData!.type"
+            :disabled="formData!.identity !== '企业'"
+            class="ml-2"
+          >
             <el-radio value="发电" size="medium">发电</el-radio>
             <el-radio value="电网" size="medium">电网</el-radio>
           </el-radio-group>
         </el-form-item>
         <div class="button">
-          <el-button type="primary" style="margin: 0 1rem;" @click="login(formRef)">
+          <el-button
+            type="primary"
+            style="margin: 0 1rem"
+            @click="toLogin(formRef)"
+          >
             登录
           </el-button>
-          <el-button type="danger" style="margin: 0 1rem;" @click="register(formRef)">
+          <el-button
+            type="danger"
+            style="margin: 0 1rem"
+            @click="toRegister(formRef)"
+          >
             注册
           </el-button>
-      </div>
+        </div>
       </el-form>
     </div>
   </div>
@@ -166,7 +203,7 @@ const register=async (formRef:FormInstance | null)=>{
       text-align: center;
       margin-bottom: 20px;
     }
-    .button{
+    .button {
       display: grid;
       grid-template-columns: 1fr 1fr;
     }

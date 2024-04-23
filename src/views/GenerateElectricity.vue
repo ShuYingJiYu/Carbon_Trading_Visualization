@@ -121,8 +121,8 @@ const rules = ref<FormRules<GenerateElectricitySubmitParams>>({
 
 const submitForm = async (form: FormInstance | null) => {
   await form?.validate();
-  await generateElectricitySubmitAPI(formData.value)
-  resetForm()
+  await generateElectricitySubmitAPI(formData.value);
+  resetForm();
   console.log(formData.value);
 };
 
@@ -188,10 +188,14 @@ const resetForm = () => {
         <el-input v-model="formData!.electricity" />
       </el-form-item>
       <div class="button">
-        <el-button type="primary" style="margin: 0 0.75rem;" @click="submitForm(formRef)">
+        <el-button
+          type="primary"
+          style="margin: 0 0.75rem"
+          @click="submitForm(formRef)"
+        >
           Submit
         </el-button>
-        <el-button type="danger" style="margin: 0 0.75rem;" @click="resetForm">
+        <el-button type="danger" style="margin: 0 0.75rem" @click="resetForm">
           Reset
         </el-button>
       </div>
@@ -221,7 +225,7 @@ const resetForm = () => {
   .form {
     margin: 0 auto;
     padding-top: 20px;
-    .button{
+    .button {
       display: grid;
       grid-template-columns: 1fr 1fr;
     }

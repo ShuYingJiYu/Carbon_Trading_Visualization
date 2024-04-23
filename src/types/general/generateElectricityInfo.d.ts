@@ -2,7 +2,7 @@ export type GenerateElectricityInfo = GenerateElectricitySubmitParams & {
   id: number;
   account: string;
   name: string;
-  LocalDateTime: string;
+  create_date: string;
   status: string;
   consumption: number;
 };

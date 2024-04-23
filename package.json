@@ -13,6 +13,7 @@
     "@types/node": "^20.12.5",
     "@vueuse/core": "^10.9.0",
     "axios": "^1.6.8",
+    "echarts": "^5.5.0",
     "element-plus": "^2.6.3",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
