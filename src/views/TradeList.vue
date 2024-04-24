@@ -1,16 +1,25 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import { generateElectricityInfoAPI } from "@/apis/enterprise/historySubmit";
-import { GenerateElectricityInfo } from "@/types/general/generateElectricityInfo";
-const historyList = ref<GenerateElectricityInfo[]>();
-const getHistory = async () => {
-  const res = await generateElectricityInfoAPI();
-  historyList.value = res.data;
-  console.log(historyList.value);
-};
+import { enterpriseTradeListAPI } from "@/apis/general/tradeList";
+import type { TradeInfo } from "@/types/general/tradeInfo";
+import { ElMessageBox } from "element-plus";
+
+const tradeList = ref<TradeInfo[]>()
+const getTradeList = async() => {
+  const res = await enterpriseTradeListAPI()
+  tradeList.value = res.data
+}
+
 onMounted(() => {
-  getHistory();
+  getTradeList()
 });
+
+const detail = (index: number) => {
+  ElMessageBox.alert(tradeList.value?.at(index)?.content, "内容详细", {
+    confirmButtonText: "OK",
+  });
+};
+
 </script>
 
 <template>
@@ -26,68 +35,56 @@ onMounted(() => {
     <div class="body">
       <div class="list">
         <div class="item">
-          <div>燃煤消耗量</div>
-          <div>原油消耗量</div>
-          <div>燃料油消耗量</div>
-          <div>汽油消耗量</div>
-          <div>炼厂干气消耗量</div>
-          <div>其他制品消耗量</div>
-          <div>天然气消耗量</div>
-          <div>焦炉煤气消耗量</div>
-          <div>其他煤气消耗量</div>
-          <div>脱硫剂消耗量</div>
-          <div>电力购入量</div>
-          <div>提交时间</div>
-          <div>总碳消耗量</div>
-          <div>提交状态</div>
+          <div>发起者账号</div>
+          <div>接收者账号</div>
+          <div>发起者用户名</div>
+          <div>接收者用户名</div>
+          <div>交易内容</div>
+          <div>交易碳币</div>
+          <div>交易发起时间</div>
+          <div>交易状态</div>
+          <div></div>
         </div>
-        <div class="item" v-for="item in historyList" :key="item.id">
+        <div class="item" v-for="(item, index) in tradeList" :key="item.id">
           <div>
-            {{ item.coal_burning }}
+            {{ item.initiator_account }}
           </div>
           <div>
-            {{ item.crude_oil }}
+            {{ item.receiver_account }}
           </div>
           <div>
-            {{ item.fuel_oil }}
+            {{ item.initiator_name }}
           </div>
           <div>
-            {{ item.gasoline }}
+            {{ item.receiver_name }}
           </div>
           <div>
-            {{ item.refinery_gas }}
+            {{ item.content.slice(0, 10) }}
+            {{ item.content.length > 10 ? "..." : "" }}
           </div>
           <div>
-            {{ item.other_products }}
-          </div>
-          <div>
-            {{ item.natural_gas }}
-          </div>
-          <div>
-            {{ item.coke_oven_gas }}
-          </div>
-          <div>
-            {{ item.other_gas }}
-          </div>
-          <div>
-            {{ item.desulfurizing_agent }}
-          </div>
-          <div>
-            {{ item.electricity }}
+            {{ item.pay_coin }}
           </div>
           <div>
             {{ item.create_date }}
           </div>
           <div>
-            {{ item.consumption }}
+            {{ item.status }}
           </div>
           <div>
-            {{ item.status }}
+            <el-button
+              type="warning"
+              style="width: 6rem"
+              @click="detail(index)"
+            >
+              内容详细
+            </el-button>
           </div>
         </div>
       </div>
     </div>
   </div>
+
 </template>
 
 <style scoped>
@@ -131,14 +128,13 @@ onMounted(() => {
       row-gap: 0.3rem;
       .item {
         display: grid;
-        grid-template-columns: repeat(14, 1fr);
+        grid-template-columns: repeat(9, 1fr);
         grid-auto-rows: minmax(3rem, auto);
         align-items: center;
         background-color: white;
         border-radius: 0.3125rem;
         div {
           text-align: center;
-          padding: 0 0.125rem;
         }
       }
     }

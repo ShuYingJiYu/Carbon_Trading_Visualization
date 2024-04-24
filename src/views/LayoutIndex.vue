@@ -2,6 +2,8 @@
 import { useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 import { enterpriseInfoAPI } from "@/apis/enterprise/info";
+import { agencyInfoAPI } from "@/apis/agency/info";
+import { adminInfoAPI } from "@/apis/admin/info";
 import { useClientStore } from "@/stores";
 const clientStore = useClientStore();
 const router = useRouter();
@@ -19,7 +21,12 @@ const getInfo = async () => {
   if (clientStore.identity === "企业") {
     const res = await enterpriseInfoAPI();
     clientInfo.value = res.data;
-    console.log(clientInfo.value);
+  }else if(clientStore.identity === "政府"){
+    const res = await agencyInfoAPI();
+    clientInfo.value = res.data;
+  }else if(clientStore.identity === "管理员"){
+    const res = await adminInfoAPI();
+    clientInfo.value = res.data;
   }
 };
 
@@ -62,21 +69,57 @@ onMounted(() => {
           <el-menu-item class="aside-item" index="/info_view">
             <span>信息总览</span>
           </el-menu-item>
-          <el-menu-item class="aside-item" index="/data_submit">
+          <el-menu-item
+            class="aside-item"
+            index="/data_submit"
+            v-if="clientStore.identity === '企业'"
+          >
             <span>数据提交</span>
           </el-menu-item>
-          <el-menu-item class="aside-item" index="/data_history">
+          <el-menu-item
+            class="aside-item"
+            index="/data_history"
+            v-if="clientStore.identity === '企业'"
+          >
             <span>数据记录</span>
           </el-menu-item>
-          <el-menu-item class="aside-item" index="/trade_apply">
+          <el-menu-item
+            class="aside-item"
+            index="/trade_apply"
+            v-if="clientStore.identity === '企业'"
+          >
             <span>交易申请</span>
           </el-menu-item>
-          <el-menu-item class="aside-item" index="/trade_history">
+          <el-menu-item
+            class="aside-item"
+            index="/trade_history"
+            v-if="clientStore.identity === '企业'"
+          >
             <span>交易记录</span>
           </el-menu-item>
+          <el-menu-item
+            class="aside-item"
+            index="/enterprise_list"
+            v-if="clientStore.identity !== '企业'"
+          >
+            <span>企业总览</span>
+          </el-menu-item>
+          <el-menu-item
+            class="aside-item"
+            index="/trade_list"
+            v-if="clientStore.identity !== '企业'"
+          >
+            <span>交易总览</span>
+          </el-menu-item>
+          <el-sub-menu class="aside-item" v-if="clientStore.identity !== '企业'">
+            <template #title>
+              <span style="margin-left: 2.6875rem;">数据总览</span>
+            </template>
+            <el-menu-item style="padding-left: 4.375rem;" index="/data_list/generateElectricity">发电企业</el-menu-item>
+            <el-menu-item style="padding-left: 4.375rem;" index="/data_list/electricGrid">电网企业</el-menu-item>
+          </el-sub-menu>
         </el-menu></el-aside
       >
-
       <!-- main布局 -->
       <el-main>
         <RouterView />
@@ -121,7 +164,7 @@ onMounted(() => {
       font-size: large;
     }
   }
-  .aside-item:nth-child(-n + 4) {
+  .aside-item:not(:last-child) {
     span {
       border-bottom: 0.0625rem solid hsl(0, 0%, 45%);
     }

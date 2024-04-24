@@ -1,16 +1,46 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import { generateElectricityInfoAPI } from "@/apis/enterprise/historySubmit";
-import { GenerateElectricityInfo } from "@/types/general/generateElectricityInfo";
-const historyList = ref<GenerateElectricityInfo[]>();
-const getHistory = async () => {
-  const res = await generateElectricityInfoAPI();
-  historyList.value = res.data;
-  console.log(historyList.value);
+import { generateElectricityListAPI } from "@/apis/general/generateElectricityList";
+import type { GenerateElectricityInfo } from "@/types/general/generateElectricityInfo";
+import { useClientStore } from '@/stores'
+import { adminAuditGenerateElectricityAPI } from '@/apis/admin/audit'
+import { ElMessage } from "element-plus";
+const clientStore = useClientStore()
+const generateElectricityList = ref<GenerateElectricityInfo[]>();
+const dialogVisible = ref(false);
+const getGenerateElectricityList = async () => {
+  const res = await generateElectricityListAPI();
+  generateElectricityList.value = res.data;
+  console.log(generateElectricityList.value);
 };
 onMounted(() => {
-  getHistory();
+  getGenerateElectricityList();
 });
+
+const nowId = ref<string>()
+const accept = async() => {
+  await adminAuditGenerateElectricityAPI({
+    id: nowId.value || '',
+    status: 1
+  })
+  ElMessage({
+    message: '审核通过',
+    type: 'success',
+  })
+  getGenerateElectricityList()
+}
+
+const refuse = async () => {
+  await adminAuditGenerateElectricityAPI({
+    id: nowId.value || '',
+    status: 2
+  })
+  ElMessage({
+    message: '审核拒绝',
+    type: 'success',
+  })
+  getGenerateElectricityList()
+}
 </script>
 
 <template>
@@ -26,6 +56,7 @@ onMounted(() => {
     <div class="body">
       <div class="list">
         <div class="item">
+          <div>企业名</div>
           <div>燃煤消耗量</div>
           <div>原油消耗量</div>
           <div>燃料油消耗量</div>
@@ -41,7 +72,10 @@ onMounted(() => {
           <div>总碳消耗量</div>
           <div>提交状态</div>
         </div>
-        <div class="item" v-for="item in historyList" :key="item.id">
+        <div class="item" v-for="item in generateElectricityList" :key="item.id">
+          <div>
+            {{ item.name }}
+          </div>
           <div>
             {{ item.coal_burning }}
           </div>
@@ -84,10 +118,52 @@ onMounted(() => {
           <div>
             {{ item.status }}
           </div>
+          <div>
+            <el-button
+              type="primary"
+              style="width: 4.3rem"
+              :disabled="
+                item.status !== '待审核' ||
+                clientStore.identity !== '管理员'
+              "
+              @click="
+                dialogVisible = true;
+                nowId = item.id.toString();
+              "
+            >
+              审核提交
+            </el-button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <el-dialog v-model="dialogVisible" title="审核提交" width="500">
+    <div class="dialog">
+      <el-button
+        class="button"
+        type="primary"
+        @click="
+          dialogVisible = false;
+          accept();
+        "
+      >
+        审核通过
+      </el-button>
+      <el-button
+        class="button"
+        type="danger"
+        @click="
+          dialogVisible = false;
+          refuse();
+        "
+      >
+        审核拒绝
+      </el-button>
+      <el-button class="button" @click="dialogVisible = false">关闭</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <style scoped>
@@ -131,7 +207,7 @@ onMounted(() => {
       row-gap: 0.3rem;
       .item {
         display: grid;
-        grid-template-columns: repeat(14, 1fr);
+        grid-template-columns: repeat(16, 1fr);
         grid-auto-rows: minmax(3rem, auto);
         align-items: center;
         background-color: white;
@@ -142,6 +218,15 @@ onMounted(() => {
         }
       }
     }
+  }
+}
+
+.dialog {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-items: center;
+  .button {
+    width: 6.5rem;
   }
 }
 </style>
