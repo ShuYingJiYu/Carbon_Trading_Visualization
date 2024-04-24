@@ -5,12 +5,142 @@ import type { ElectricGridInfo } from "@/types/general/electricGridInfo";
 import { useClientStore } from "@/stores";
 import { adminAuditElectricGridAPI } from '@/apis/admin/audit'
 import { ElMessage } from "element-plus";
+import VChart from "vue-echarts";
 const clientStore = useClientStore();
 const electricGridList = ref<ElectricGridInfo[]>();
 const dialogVisible = ref(false);
 const getElectricGridList = async () => {
   const res = await electricGridListAPI();
   electricGridList.value = res.data;
+  option1.value = {
+    title: {
+      text: "最近七次提交的表单数据",
+    },
+    tooltip: {
+      trigger: "axis",
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      containLabel: true,
+    },
+    toolbox: {
+      feature: {
+        saveAsImage: {},
+      },
+    },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: getField("create_date"),
+    },
+    yAxis: {
+      type: "value",
+    },
+    series: [
+      {
+        name: "电厂上网电量",
+        type: "line",
+        stack: "Total",
+        data: getField("PPGCP"),
+      },
+      {
+        name: "自外省输入电量",
+        type: "line",
+        stack: "Total",
+        data: getField("IIE"),
+      },
+      {
+        name: "向外省输出电量",
+        type: "line",
+        stack: "Total",
+        data: getField("IEE"),
+      },
+      {
+        name: "售电量",
+        type: "line",
+        stack: "Total",
+        data: getField("electricity_sales"),
+      },
+      {
+        name: "输配电量",
+        type: "line",
+        stack: "Total",
+        data: getField("transmission_distribution"),
+      },
+      {
+        name: "退休设备总容量",
+        type: "line",
+        stack: "Total",
+        data: getField("retirement_capacity"),
+      },
+      {
+        name: "退休设备总回收量",
+        type: "line",
+        stack: "Total",
+        data: getField("retirement_recovery"),
+      },
+      {
+        name: "修理设备总容量",
+        type: "line",
+        stack: "Total",
+        data: getField("fix_capacity"),
+      },
+      {
+        name: "修理设备总回收量",
+        type: "line",
+        stack: "Total",
+        data: getField("fix_recovery"),
+      }
+    ],
+  };
+  option2.value = {
+    title: {
+      text: "最近七次提交的碳消耗量",
+    },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "cross",
+        crossStyle: {
+          color: "#999",
+        },
+      },
+    },
+    toolbox: {
+      feature: {
+        dataView: { show: true, readOnly: false },
+        magicType: { show: true, type: ["bar"] },
+        restore: { show: true },
+        saveAsImage: { show: true },
+      },
+    },
+    xAxis: [
+      {
+        type: "category",
+        data: getField("create_date"),
+        axisPointer: {
+          type: "shadow",
+        },
+      },
+    ],
+    yAxis: {
+      type: "value",
+    },
+    series: [
+      {
+        name: "碳消耗量",
+        type: "bar",
+        tooltip: {
+          valueFormatter: function (value: any) {
+            return (value as number);
+          },
+        },
+        data: getField("consumption"),
+      },
+    ],
+  };
 };
 onMounted(() => {
   getElectricGridList();
@@ -40,16 +170,37 @@ const refuse = async () => {
   })
   getElectricGridList()
 }
+
+const getField = (index: string) => {
+  if (index === "create_date") {
+    let newArr = electricGridList.value?.slice(0, 7).map((item) => item[index]);
+    while (newArr!.length < 7) {
+      newArr?.unshift(newArr![0]);
+    }
+    return newArr;
+  } else {
+    let newArr = electricGridList.value
+      ?.slice(0, 7)
+      .map((item) => (item[index] >= 0 ? item[index] : -1 * item[index]));
+    while (newArr!.length < 7) {
+      newArr?.unshift(0);
+    }
+    return newArr;
+  }
+};
+
+const option1 = ref();
+const option2 = ref();
 </script>
 
 <template>
   <div class="main">
     <div class="header">
       <div class="contain">
-        <div class="text"></div>
+        <v-chart class="chart" :option="option1" />
       </div>
       <div class="contain">
-        <div class="text"></div>
+        <v-chart class="chart" style="margin-top: 3.125rem;" :option="option2" />
       </div>
     </div>
     <div class="body">
@@ -164,7 +315,7 @@ const refuse = async () => {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-rows: 1fr 4fr;
+  grid-template-rows:  400px auto;
   grid-template-columns: 1fr;
   row-gap: 2rem;
   padding: 0.7rem 5rem;
@@ -181,8 +332,9 @@ const refuse = async () => {
       align-items: center;
       border-radius: 1.25rem;
       background-image: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%);
-      .text {
-        font-size: 1.25rem;
+      .chart {
+        width: 600px;
+        height: 350px;
       }
     }
   }
@@ -198,7 +350,7 @@ const refuse = async () => {
       .item {
         display: grid;
         grid-template-columns: repeat(14, 1fr);
-        grid-auto-rows: minmax(3rem, auto);
+        grid-auto-rows: minmax(4rem, auto);
         align-items: center;
         background-color: white;
         border-radius: 0.3125rem;

@@ -4,13 +4,88 @@ import { tradeInfoAPI } from "@/apis/enterprise/historyTrade";
 import type { TradeInfo } from "@/types/general/tradeInfo";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { enterpriseInfoAPI } from "@/apis/enterprise/info";
+import VChart from "vue-echarts";
 import { enterpriseHandleTradeAPI } from "@/apis/enterprise/handleTrade";
 import { EnterpriseHandleTradeParams } from "@/types/enterprise/handleTrade";
 const historyList = ref<TradeInfo[]>();
 const getHistory = async () => {
   const res = await tradeInfoAPI();
   historyList.value = res.data;
-  console.log(historyList.value);
+  option1.value = {
+    title: {
+      text: "最近七次交易的碳币数",
+    },
+    tooltip: {
+      trigger: "axis",
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      containLabel: true,
+    },
+    toolbox: {
+      feature: {
+        saveAsImage: {},
+      },
+    },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: getField("create_date"),
+    },
+    yAxis: {
+      type: "value",
+    },
+    series: [
+      {
+        name: "碳交易",
+        type: "line",
+        stack: "Total",
+        data: getField("pay_coin"),
+      },
+    ],
+  };
+  option2.value = {
+    tooltip: {
+    trigger: 'item'
+  },
+  legend: {
+    top: '5%',
+    left: 'center'
+  },
+  series: [
+    {
+      name: 'Access From',
+      type: 'pie',
+      radius: ['40%', '70%'],
+      avoidLabelOverlap: false,
+      padAngle: 5,
+      itemStyle: {
+        borderRadius: 10
+      },
+      label: {
+        show: false,
+        position: 'center'
+      },
+      emphasis: {
+        label: {
+          show: false,
+          fontSize: 40,
+          fontWeight: 'bold'
+        }
+      },
+      labelLine: {
+        show: false
+      },
+      data: [
+        { value: getType(0), name: '待接受' },
+        { value: getType(1), name: '已接受' },
+        { value: getType(2), name: '已拒绝' },
+      ]
+    }
+  ]
+  };
 };
 onMounted(() => {
   getHistory();
@@ -21,7 +96,6 @@ const clientInfo = ref();
 const getInfo = async () => {
   const res = await enterpriseInfoAPI();
   clientInfo.value = res.data;
-  console.log(clientInfo.value);
 };
 
 const detail = (index: number) => {
@@ -59,16 +133,63 @@ const refuse = async () => {
   });
   getHistory();
 };
+
+const getField = (index: string) => {
+  if (index === "create_date") {
+    let newArr = historyList.value?.slice(0, 7).map((item) => item[index]);
+    while (newArr!.length < 7) {
+      newArr?.unshift(newArr![0]);
+    }
+    return newArr;
+  } else {
+    let newArr = historyList.value
+      ?.slice(0, 7)
+      .map((item) => (item.pay_coin >= 0 ? item.pay_coin  : -1 * item.pay_coin));
+    while (newArr!.length < 7) {
+      newArr?.unshift(0);
+    }
+    return newArr;
+  }
+};
+
+const getType = (index:number) => {
+  let count = 0;
+  var i = 0;
+  if (index === 0) {
+    for (i = 0; i < historyList.value!.length; i++){
+      if (historyList.value![i].status === "待接受") {
+        count++;
+      }
+    }
+    return count;
+  }else if(index === 1){
+    for (i = 0; i < historyList.value!.length; i++){
+      if (historyList.value![i].status === "已接受") {
+        count++;
+      }
+    }
+    return count;
+  }else{
+    for (i = 0; i < historyList.value!.length; i++){
+      if (historyList.value![i].status === "已拒绝") {
+        count++;
+      }
+    }
+    return count;
+  }
+}
+const option1 = ref();
+const option2 = ref();
 </script>
 
 <template>
   <div class="main">
     <div class="header">
       <div class="contain">
-        <div class="text"></div>
+        <v-chart class="chart" :option="option1" />
       </div>
       <div class="contain">
-        <div class="text"></div>
+        <v-chart class="chart" style="margin-top: 3.125rem;" :option="option2" />
       </div>
     </div>
     <div class="body">
@@ -176,7 +297,7 @@ const refuse = async () => {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-rows: 1fr 4fr;
+  grid-template-rows: 400px auto;
   grid-template-columns: 1fr;
   row-gap: 2rem;
   padding: 0.7rem 5rem;
@@ -193,8 +314,9 @@ const refuse = async () => {
       align-items: center;
       border-radius: 1.25rem;
       background-image: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%);
-      .text {
-        font-size: 1.25rem;
+      .chart {
+        width: 600px;
+        height: 350px;
       }
     }
   }
@@ -210,12 +332,13 @@ const refuse = async () => {
       .item {
         display: grid;
         grid-template-columns: repeat(10, 1fr);
-        grid-auto-rows: minmax(3rem, auto);
+        grid-auto-rows: minmax(4rem, auto);
         align-items: center;
         background-color: white;
         border-radius: 0.3125rem;
         div {
           text-align: center;
+          padding: 0 0.125rem;
         }
       }
     }

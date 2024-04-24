@@ -5,6 +5,7 @@ import router from "./router";
 import pinia from "./stores";
 import { lazyPlugin } from "./directives";
 import 'element-plus/theme-chalk/src/index.scss'
+import 'echarts'
 
 
 const app = createApp(App);
