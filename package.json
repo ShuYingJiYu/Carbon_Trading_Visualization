@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5174",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
@@ -28,6 +28,8 @@
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.24.0",
+    "less": "^4.2.0",
+    "less-loader": "^12.2.0",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
     "sass": "^1.74.1",

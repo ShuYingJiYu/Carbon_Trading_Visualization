@@ -3,7 +3,7 @@ import axios from "axios";
 import router from "@/router";
 import { ElMessage } from "element-plus";
 
-const baseURL = "http://localhost:8080";
+const baseURL = "https://trading.sakurapuare.com/api/";
 
 const instance = axios.create({
   baseURL,
