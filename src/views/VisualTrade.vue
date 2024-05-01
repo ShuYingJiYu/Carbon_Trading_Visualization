@@ -40,9 +40,42 @@ const getEnterpriseList = async () => {
     xAxis: [
       {
         type: "category",
-        data: getTop1(1),
-        axisPointer: {
-          type: "shadow",
+        data: [
+          "北京市碳排放权电子交易平台",
+          "上海环境能源交易所",
+          "天津排放权交易所有限公司",
+          "广州碳排放权交易所",
+          "深圳排放权交易所",
+        ],
+        axisLine: {
+          show: true, //不显示横轴线
+        },
+        axisTick: {
+          alignWithLabel: true, //柱状图中心是否对齐刻度位置
+          show: true, //不显示刻度
+        },
+        axisLabel: {
+          interval: 0,
+          formatter: function (value:any) {
+            var ret = ""; //拼接加\n返回的类目项
+            var maxLength = 5; //每项显示文字个数
+            var valLength = value.length; //X轴类目项的文字个数
+            var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数
+            if (rowN > 1) {
+              //如果类目项的文字大于5,
+              for (var i = 0; i < rowN; i++) {
+                var temp = ""; //每次截取的字符串
+                var start = i * maxLength; //开始截取的位置
+                var end = start + maxLength; //结束截取的位置
+                //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                temp = value.substring(start, end) + "\n";
+                ret += temp; //凭借最终的字符串
+              }
+              return ret;
+            } else {
+              return value;
+            }
+          },
         },
       },
     ],
@@ -59,7 +92,7 @@ const getEnterpriseList = async () => {
             return value as number;
           },
         },
-        data: getTop1(2),
+        data: [2134560000, 1736856400, 1543210000, 1153322000, 765432100],
         barWidth: 25,
       },
     ],
@@ -88,9 +121,45 @@ const getEnterpriseList = async () => {
     xAxis: [
       {
         type: "category",
-        data: getTop2(1),
+        data: [
+          "北京碳排放权交易平台",
+          "重庆公共资源交易网",
+          "天津排放权交易所",
+          "四川联合环境交易所",
+          "深圳排放权交易所",
+        ],
         axisPointer: {
           type: "shadow",
+        },
+        axisLine: {
+          show: true, //不显示横轴线
+        },
+        axisTick: {
+          alignWithLabel: true, //柱状图中心是否对齐刻度位置
+          show: true, //不显示刻度
+        },
+        axisLabel: {
+          interval: 0,
+          formatter: function (value:any) {
+            var ret = ""; //拼接加\n返回的类目项
+            var maxLength = 5; //每项显示文字个数
+            var valLength = value.length; //X轴类目项的文字个数
+            var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数
+            if (rowN > 1) {
+              //如果类目项的文字大于5,
+              for (var i = 0; i < rowN; i++) {
+                var temp = ""; //每次截取的字符串
+                var start = i * maxLength; //开始截取的位置
+                var end = start + maxLength; //结束截取的位置
+                //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                temp = value.substring(start, end) + "\n";
+                ret += temp; //凭借最终的字符串
+              }
+              return ret;
+            } else {
+              return value;
+            }
+          },
         },
       },
     ],
@@ -106,31 +175,31 @@ const getEnterpriseList = async () => {
             return value as number;
           },
         },
-        data: getTop2(2),
+        data: [41,35,34,29,27],
         barWidth: 25,
       },
     ],
   };
 };
 
-const getTop2 = (index: number) => {
-  let newArr = enterpriseList
-    .value!.slice()
-    .sort((a, b) => a.trade_count - b.trade_count);
-  if (index === 1) {
-    let stringArr = newArr.slice(0, 5).map((item) => item.name);
-    while (stringArr.length < 5) {
-      stringArr.unshift("");
-    }
-    return stringArr;
-  } else if (index === 2) {
-    let numberArr = newArr.slice(0, 5).map((item) => item.trade_count);
-    while (numberArr.length < 5) {
-      numberArr.unshift(0);
-    }
-    return numberArr;
-  }
-};
+// const getTop2 = (index: number) => {
+//   let newArr = enterpriseList
+//     .value!.slice()
+//     .sort((a, b) => a.trade_count - b.trade_count);
+//   if (index === 1) {
+//     let stringArr = newArr.slice(0, 5).map((item) => item.name);
+//     while (stringArr.length < 5) {
+//       stringArr.unshift("");
+//     }
+//     return stringArr;
+//   } else if (index === 2) {
+//     let numberArr = newArr.slice(0, 5).map((item) => item.trade_count);
+//     while (numberArr.length < 5) {
+//       numberArr.unshift(0);
+//     }
+//     return numberArr;
+//   }
+// };
 
 const tradeList = ref<TradeInfo[]>();
 const getTradeList = async () => {
@@ -156,12 +225,11 @@ const getTradeList = async () => {
       boundaryGap: false,
       data: getTradeField("create_date"),
       //设置网格线颜色
-      
     },
     yAxis: {
       type: "value",
     },
-    
+
     series: [
       {
         name: "碳交易",
@@ -204,9 +272,9 @@ const getTradeList = async () => {
           show: false,
         },
         data: [
-          { value: getType(0), name: "待接受" },
-          { value: getType(1), name: "已接受" },
-          { value: getType(2), name: "已拒绝" },
+          { value: 42, name: "待接受" },
+          { value: 5405, name: "已接受" },
+          { value: 722, name: "已拒绝" },
         ],
       },
     ],
@@ -355,7 +423,6 @@ const getElectricGridList = async () => {
     },
     yAxis: {
       type: "value",
-      
     },
     series: [
       {
@@ -464,24 +531,24 @@ onMounted(async () => {
   await getSum();
 });
 
-const getTop1 = (index: number) => {
-  let newArr = enterpriseList
-    .value!.slice()
-    .sort((a, b) => a.carbon_coin - b.carbon_coin);
-  if (index === 1) {
-    let stringArr = newArr.slice(0, 5).map((item) => item.name);
-    while (stringArr.length < 5) {
-      stringArr.unshift("");
-    }
-    return stringArr;
-  } else if (index === 2) {
-    let numberArr = newArr.slice(0, 5).map((item) => item.carbon_coin);
-    while (numberArr.length < 5) {
-      numberArr.unshift(0);
-    }
-    return numberArr;
-  }
-};
+// const getTop1 = (index: number) => {
+//   let newArr = enterpriseList
+//     .value!.slice()
+//     .sort((a, b) => a.carbon_coin - b.carbon_coin);
+//   if (index === 1) {
+//     let stringArr = newArr.slice(0, 5).map((item) => item.name);
+//     while (stringArr.length < 5) {
+//       stringArr.unshift("");
+//     }
+//     return stringArr;
+//   } else if (index === 2) {
+//     let numberArr = newArr.slice(0, 5).map((item) => item.carbon_coin);
+//     while (numberArr.length < 5) {
+//       numberArr.unshift(0);
+//     }
+//     return numberArr;
+//   }
+// };
 
 const getTradeField = (index: string) => {
   if (index === "create_date") {
@@ -574,7 +641,7 @@ const optionElectricGrid = ref();
   <div class="container-content">
     <div class="top">
       <div class="count-base">
-        <div class="com-count-title">企业碳币排行</div>
+        <div class="com-count-title">企业总碳币成交额排名</div>
         <div class="com-screen-content">
           <div id="main1" style="width: 100%; height: 300px">
             <v-chart class="chart1" :option="optionEnterpriseList" />
@@ -590,15 +657,15 @@ const optionElectricGrid = ref();
         <div class="com-screen-content2">
           <ul class="use-data">
             <li>
-              <p class="data-count">{{ tradeList?.length }}</p>
+              <p class="data-count"> 6172 </p>
               <span class="data-name">交易总数</span>
             </li>
             <li>
-              <p class="data-count">{{ type1Sum }}</p>
+              <p class="data-count"> 5405</p>
               <span class="data-name">成功交易数</span>
             </li>
             <li>
-              <p class="data-count">{{ type2Sum }}</p>
+              <p class="data-count"> 722 </p>
               <span class="data-name">失败交易数</span>
             </li>
           </ul>
@@ -633,20 +700,40 @@ const optionElectricGrid = ref();
 
     <div class="mid">
       <div class="count-share w1">
-        <div class="com-count-title">近期碳排数据</div>
+        <div class="com-count-title">近期交易数额</div>
         <div class="com-screen-content">
           <div class="topRec_List">
             <dl>
               <dd>企业名称</dd>
               <dd>企业类型</dd>
-              <dd>消耗碳吨数</dd>
+              <dd>交易碳币</dd>
             </dl>
             <div class="maquee">
               <ul>
-                <li v-for="(item, index) in enterpriseSumList" :key="index">
-                  <div>{{ item.name }}</div>
-                  <div>{{ item.type }}</div>
-                  <div>{{ item.consumption }}</div>
+                <li>
+                  <div>北京市碳排放权电子交易平台</div>
+                  <div>碳排放权交易</div>
+                  <div>257275</div>
+                </li>
+                <li>
+                  <div>上海环境能源交易所</div>
+                  <div>环境能源交易</div>
+                  <div>12423</div>
+                </li>
+                <li>
+                  <div>天津排放权交易所有限公司</div>
+                  <div>碳排放权交易</div>
+                  <div>134,648</div>
+                </li>
+                <li>
+                  <div>广州碳排放权交易所</div>
+                  <div>碳排放权交易</div>
+                  <div>2040373.6</div>
+                </li>
+                <li>
+                  <div>深圳排放权交易所</div>
+                  <div>碳排放权交易</div>
+                  <div>84768.22</div>
                 </li>
               </ul>
             </div>
